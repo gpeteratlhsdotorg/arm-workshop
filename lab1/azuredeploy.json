@@ -35,7 +35,7 @@
             "tags": {
                 "displayName": "[variables('storageAccount')]"
             },
-            "sku" : {
+            "sku": {
                 "name": "[parameters('accountType')]"
             },
             "kind": "StorageV2",
@@ -44,5 +44,10 @@
             }
         }
     ],
-    "outputs": {}
+    "outputs": {
+        "storageAccount": {
+            "type": "string",
+            "value": "[variables('storageAccount')]"
+        }
+    }
 }
