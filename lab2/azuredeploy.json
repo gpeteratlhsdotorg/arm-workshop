@@ -1,45 +1,92 @@
 {
-    "$schema": "http://schema.management.azure.com/schemas/2014-04-01-preview/deploymentTemplate.json#",
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01-preview/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
-    "parameters": {
-        "webAppName": {
-            "type": "string"
-        }
-    },
-    "variables": {
-        "webAppPlan": "[concat(parameters('webAppName'), '-plan')]",
-        "webAppPlanId": "[resourceId('Microsoft.Web/serverfarms', variables('webAppPlan'))]"
-    },
     "resources": [
         {
-            "apiVersion": "2016-08-01",
-            "name": "[parameters('webAppName')]",
+            "name": "[parameters('name')]",
             "type": "Microsoft.Web/sites",
             "properties": {
-                "name": "[parameters('webAppName')]",
-                "serverFarmId": "[variables('webAppPlanId')]",
-                "hostingEnvironment": ""
+                "siteConfig": {
+                    "appSettings": [
+                        {
+                            "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+                            "value": "[reference('microsoft.insights/components/gpeterarm', '2016-08-01').InstrumentationKey]"
+                        },
+                        {
+                            "name": "XDT_MicrosoftApplicationInsights_Mode",
+                            "value": "default"
+                        },
+                        {
+                            "name": "ApplicationInsightsAgent_EXTENSION_VERSION",
+                            "value": "~2"
+                        }
+                    ]
+                },
+                "name": "[parameters('name')]",
+                "serverFarmId": "[concat('/subscriptions/', parameters('subscriptionId'),'/resourcegroups/', parameters('serverFarmResourceGroup'), '/providers/Microsoft.Web/serverfarms/', parameters('hostingPlanName'))]",
+                "hostingEnvironment": "[parameters('hostingEnvironment')]"
             },
-            "location": "[resourceGroup().location]",
             "dependsOn": [
-                "[variables('webAppPlanId')]"
-            ]
+                "[concat('Microsoft.Web/serverfarms/', parameters('hostingPlanName'))]",
+                "microsoft.insights/components/gpeterarm"
+            ],
+            "apiVersion": "2016-03-01",
+            "location": "[parameters('location')]"
         },
         {
             "apiVersion": "2016-09-01",
-            "name": "[variables('webAppPlan')]",
+            "name": "[parameters('hostingPlanName')]",
             "type": "Microsoft.Web/serverfarms",
-            "location": "[resourceGroup().location]",
+            "location": "[parameters('location')]",
             "properties": {
-                "name": "[variables('webAppPlan')]",
-                "workerSizeId": "0",
-                "reserved": false,
-                "numberOfWorkers": "1"
+                "name": "[parameters('hostingPlanName')]",
+                "workerSizeId": "[parameters('workerSize')]",
+                "numberOfWorkers": "1",
+                "hostingEnvironment": "[parameters('hostingEnvironment')]"
             },
             "sku": {
-                "Tier": "Free",
-                "Name": "F1"
+                "Tier": "[parameters('sku')]",
+                "Name": "[parameters('skuCode')]"
+            }
+        },
+        {
+            "apiVersion": "2015-05-01",
+            "name": "gpeterarm",
+            "type": "microsoft.insights/components",
+            "location": "West US 2",
+            "properties": {
+                "ApplicationId": "[parameters('name')]",
+                "Request_Source": "IbizaWebAppExtensionCreate"
             }
         }
-    ]
+    ],
+    "parameters": {
+        "name": {
+            "type": "string"
+        },
+        "hostingPlanName": {
+            "type": "string"
+        },
+        "hostingEnvironment": {
+            "type": "string"
+        },
+        "location": {
+            "type": "string"
+        },
+        "sku": {
+            "type": "string"
+        },
+        "skuCode": {
+            "type": "string"
+        },
+        "workerSize": {
+            "type": "string"
+        },
+        "serverFarmResourceGroup": {
+            "type": "string"
+        },
+        "subscriptionId": {
+            "type": "string"
+        }
+    },
 }
