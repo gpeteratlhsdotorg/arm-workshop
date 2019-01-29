@@ -2,32 +2,8 @@
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "name": {
+        "webAppName": {
             "value": "gpeterarm"
-        },
-        "hostingPlanName": {
-            "value": "gpeterarm-plan"
-        },
-        "hostingEnvironment": {
-            "value": ""
-        },
-        "location": {
-            "value": "West US 2"
-        },
-        "sku": {
-            "value": "Standard"
-        },
-        "workerSize": {
-            "value": "0"
-        },
-        "serverFarmResourceGroup": {
-            "value": "gpeterarm"
-        },
-        "skuCode": {
-            "value": "S1"
-        },
-        "subscriptionId": {
-            "value": "8d9eb93e-5c0b-476a-9f4e-9bb043363171"
         }
     }
 }
